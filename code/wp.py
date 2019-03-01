@@ -15,6 +15,9 @@ tok=[]
 with open('/home/gerardo/code/wp/data/csv/wp201601.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0 #to count how many lines are in a file
+    vocabulary_list = []
+    vocabulary_set = set(vocabulary_list)
+
     for row in csv_reader:
             line_count += 1
             tok_row0 = [word_tokenize(row[0])]  ## tokenizes the title
@@ -23,11 +26,13 @@ with open('/home/gerardo/code/wp/data/csv/wp201601.csv') as csv_file:
 
             print(len(tok_row2[0]))  #to know the length of the token
             if len(tok_row2[0]) >= 30 and len(tok_row2[0]) <= 1000:
-                ##This token is not going to be part of the final ones
+                ##This token is going to be part of the final ones
                 print(tok_row0) #Printing the title
                 print(tok_row1) #Printing the author
-                print(tok_row2)#Printing the body
-
+                print(tok_row2) #Printing the body
+                vocabulary_list = tok_row0
+                vocabulary_list = vocabulary_list + tok_row2 ## in order to get the vocabulary
+                print('Vocabulary list', vocabulary_list)
 
 
 #with open('/home/gerardo/Documents/Mios/Docsmios/AI/wp/wp201601.csv') as csv_file:
