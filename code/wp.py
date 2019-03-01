@@ -7,7 +7,11 @@ tok=[]
 ## Column 2 post author
 ## Column 3 comments body
 ## Column 4 comments author
-with open('/home/gerardo/Documents/Mios/Docsmios/AI/wp/wp201601.csv') as csv_file:
+
+## TODO: Create a list of .csv files and make a loop on it to process each file
+##       Export data on .json format
+
+with open('/home/harmodio/code/ganso/wp/data/csv/wp201601.csv') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     line_count = 0 #to count how many lines are in a file
     for row in csv_reader:
