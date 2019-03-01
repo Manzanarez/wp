@@ -19,6 +19,7 @@ import glob
 
 #print(glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
 vocabulary_list = []
+corpus_size = 0
 file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
 
 for file_name in file_list:
@@ -35,6 +36,7 @@ for file_name in file_list:
 
             print(len(tok_row2[0]))  #to know the length of the token
             if len(tok_row2[0]) >= 30 and len(tok_row2[0]) <= 1000:
+                corpus_size+=1
                 ##This token is going to be part of the final ones
                 print(tok_row0[0]) #Printing the title
                 print('title lenght:', len(tok_row0[0]))
@@ -47,6 +49,7 @@ for file_name in file_list:
 unique_vocabulary_set = set (vocabulary_list)
 print ('UNIQUE_VOCABULARY_SET:',sorted(unique_vocabulary_set))
 print ('UNIQUE_VOCABULARY_SET_SIZE:',len(unique_vocabulary_set))
+print ('CORPUS_SIZE:', corpus_size)
     
 #with open('/home/gerardo/Documents/Mios/Docsmios/AI/wp/wp201601.csv') as csv_file:
 #    csv_reader = csv.reader(csv_file, delimiter=',')
