@@ -19,7 +19,8 @@ import glob
 
 #print(glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
 vocabulary_list = []
-file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
+#file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
+file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
 
 for file_name in file_list:
     with open(file_name) as csv_file:
