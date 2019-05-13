@@ -16,7 +16,9 @@ parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Langua
 #Original
 ##parser.add_argument('--data', type=str, default='/home/gerardo/AI/wlm/data/wikitext-2',
 ## GAM - Activate 6may19
-parser.add_argument('--data', type=str, default='/home/gerardo/code/wp/data/train',
+##parser.add_argument('--data', type=str, default='/home/gerardo/code/wp/data/train',
+## GAM ~ server Paris
+parser.add_argument('--data', type=str, default='/users/gerardo.aleman/wp/data/train',
 ##parser.add_argument('--data', type=str, default='/opt/wp/data/txt/clean',
                     help='location of the data corpus')
 parser.add_argument('--model', type=str, default='LSTM',
