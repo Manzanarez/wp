@@ -60,7 +60,7 @@ class Corpus(object):
 #GAM and self.idx as a list
         self.dictionary = Dictionary()
 ##Original
-        self.trains = self.tokenize(os.path.join(path, 'train.txt'))
+##        self.trains = self.tokenize(os.path.join(path, 'train.txt'))
 ## GAM- Tokenizes lines available in the file and stores it in self.train (the corpus used to train)
 #   GAM~ Makes a tensor (self.train) with the index of the words in the file used to train
 ##GAM May619 Activate
