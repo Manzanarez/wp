@@ -1,0 +1,76 @@
+word,Classification,Confidence
+anal,profanity,0.774
+anus,profanity,0.459
+arse,profanity,0.147
+ass,profanity,0.964
+ass fuck,profanity,0.964
+ass hole,profanity,0.963
+assfucker,clean,0.922
+asshole,profanity,0.961
+assshole,clean,0.885
+bastard,profanity,0.818
+bitch,profanity,0.96
+black cock,profanity,0.861
+bloody hell,profanity,0.964
+boong,clean,0.905
+cock,profanity,0.957
+cockfucker,clean,0.962
+cocksuck,clean,0.882
+cocksucker,profanity,0.74
+coon,clean,0.81
+coonnass,clean,0.969
+crap,profanity,0.964
+cunt,profanity,0.948
+cyberfuck,clean,0.919
+damn,profanity,0.964
+darn,clean,0.958
+dick,profanity,0.957
+dirty,clean,0.248
+douche,profanity,0.205
+dummy,clean,0.956
+erect,profanity,0.097
+erection,profanity,0.323
+erotic,clean,0.111
+escort,clean,0.75
+fag,profanity,0.993
+faggot,profanity,0.982
+fuck,profanity,0.964
+Fuck off,profanity,0.964
+fuck you,profanity,0.964
+fuckass,clean,0.637
+fuckhole,clean,1
+god damn,profanity,0.964
+gook,clean,0.895
+hard core,clean,0.957
+hardcore,clean,0.921
+homoerotic,clean,0.188
+hore,clean,0.931
+lesbian,clean,0.353
+lesbians,clean,0.473
+mother fucker,clean,0.361
+motherfuck,profanity,0.894
+motherfucker,profanity,0.901
+negro,clean,0.872
+nigger,profanity,0.957
+orgasim,clean,0.109
+orgasm,profanity,0.114
+penis,profanity,0.895
+penisfucker,clean,0.973
+piss,profanity,0.962
+piss off,profanity,0.963
+porn,profanity,0.964
+porno,clean,0.249
+pornography,profanity,0.093
+pussy,profanity,0.654
+retard,profanity,0.773
+sadist,clean,0.713
+sex,profanity,0.959
+sexy,clean,0.515
+shit,profanity,0.964
+slut,profanity,0.576
+son of a bitch,profanity,0.983
+suck,clean,0.939
+tits,profanity,0.945
+viagra,clean,0.249
+whore,profanity,0.961
+xxx,clean,0.714
