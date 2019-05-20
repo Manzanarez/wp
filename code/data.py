@@ -60,38 +60,40 @@ class Corpus(object):
 #GAM and self.idx as a list
         self.dictionary = Dictionary()
 ##Original
-        self.trains = self.tokenize(os.path.join(path, 'train.txt'))
+##        self.trains = self.tokenize(os.path.join(path, 'train.txt'))
 ## GAM- Tokenizes lines available in the file and stores it in self.train (the corpus used to train)
 #   GAM~ Makes a tensor (self.train) with the index of the words in the file used to train
 ##GAM May619 Activate
-##        self.trainp = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_train.09042019.txt')) ## Prompts to train
-        self.trains = self.tokenize(os.path.join(path, 'stories.tokens.alligned_train.09042019.txt')) ## Stories to train
+        self.trainp,self.linesptr = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_train.24042019.txt')) ## Prompts to train, tensor with ids of words
+        self.trains,self.linesstr = self.tokenize(os.path.join(path, 'stories.tokens.alligned_train.24042019.txt')) ## Stories to train, tensor with ids of words
 ## Original
 ##        self.valids = self.tokenize(os.path.join(path, 'valid.txt'))
 ##        self.tests = self.tokenize(os.path.join(path, 'test.txt'))
 #   GAM~ Makes a tensor (self.valid) with the index of the words in the file used to validate
 ##GAM May619 Activate
-##        self.validp = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_validate.09042019.txt')) #Prompts to validate
+        self.validp,self.linespva = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_validate.09042019.txt')) #Prompts to validate
 ##GAM May619 Activate
-        self.valids = self.tokenize(os.path.join(path, 'stories.tokens.alligned_validate.09042019.txt')) #Stories to validate
+        self.valids,self.linessva = self.tokenize(os.path.join(path, 'stories.tokens.alligned_validate.09042019.txt')) #Stories to validate
 #   GAM~ Makes a tensor (self.valid) with the index of the words in the file used to test
 ##GAM May619 Activate
-##        self.testp = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_test.09042019.txt')) #Prompts to test
+        self.testp,self.linespts = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_test.09042019.txt')) #Prompts to test
 ##GAM May619 Activate
-        self.tests = self.tokenize(os.path.join(path, 'stories.tokens.alligned_test.09042019.txt')) #Stories to test
+        self.tests,self.linessts = self.tokenize(os.path.join(path, 'stories.tokens.alligned_test.09042019.txt')) #Stories to test
 
     def tokenize(self, path):
         """Tokenizes a text file."""
+        linesf = 0
         assert os.path.exists(path)
         # Add words to the dictionary
         with open(path, 'r', encoding="utf8") as f:
             tokens = 0
             for line in f:
 ##                words = line.split() + ['<eos>'] ##GAM- Adds a '<eos>' at the end of the line but the file already has an EOD
+                linesf += 1
                 words = line.split()
                 tokens += len(words) ## GAM ~ The quantity of words
                 for word in words:
-                    self.dictionary.add_word(word)  ## GAM ~ Adds a word that has from the corpus to the dictionary
+                    self.dictionary.add_word(word)  ## GAM ~ Adds a word from the corpus to the dictionary
                                                     ## GAM ~ idx2word ( list[] ) and word2idx ( dict{} )
 
         # Tokenize file content
@@ -108,6 +110,30 @@ class Corpus(object):
          ## GAM~ Remove           print ('self.dictionary.word2idx[word]: ', self.dictionary.word2idx[word])
          ## GAM~ Remove           print ('ids[token]: ', ids[token])
                     token += 1
+## GAM ~ To find only words that are repeated more than 10 times        self.dictionary.morethan10(self.dictionary.vocabulary)
+        print('ids:',ids)
+        return ids,linesf
+
+class Corpusline(object):
+    def __init__(self,x,wi):
+        self.dic = Dictionary()
+        self.linesinfile = self.tokenizel(x,wi)
+ #       """Tokenizes a text file."""
+
+    def tokenizel(self,x,wi):
+        linesinfile = 0
+        token = 0
+        words = x.split()
+        tokens = len(words)
+        ids = torch.LongTensor(tokens)  # GAM ~ Initilizes 'ids' as a tensor with data type 64-bit integer with the size of 'tokens'
+        for word in words:
+            ids[token] = wi[word]
+##            ids[token] = self.dic.word2idx[word] #GAM~ Saves all indixes that word2idx has for every 'word' in the line of 'f'
+                                                                #GAM~ in "ids" tensor. Note: word2idx is a vocabulary with unique words
+                                                                #GAM ~so "ids" has the index that correspond to that word in the line of 'f'
+         ## GAM~ Remove           print ('self.dictionary.word2idx[word]: ', self.dictionary.word2idx[word])
+         ## GAM~ Remove           print ('ids[token]: ', ids[token])
+            token += 1
 ## GAM ~ To find only words that are repeated more than 10 times        self.dictionary.morethan10(self.dictionary.vocabulary)
         print('ids:',ids)
         return ids

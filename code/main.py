@@ -17,6 +17,8 @@ parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Langua
 ##parser.add_argument('--data', type=str, default='/home/gerardo/AI/wlm/data/wikitext-2',
 ## GAM - Activate 6may19
 parser.add_argument('--data', type=str, default='/home/gerardo/code/wp/data/train',
+## GAM ~ server Paris
+##parser.add_argument('--data', type=str, default='/users/gerardo.aleman/wp/data/train',
 ##parser.add_argument('--data', type=str, default='/opt/wp/data/txt/clean',
                     help='location of the data corpus')
 parser.add_argument('--model', type=str, default='LSTM',
@@ -106,23 +108,23 @@ def batchify(data, bsz):
 eval_batch_size = 10
 ##Train data (prompts and stories
 ##GAM May619 Activate
-##train_datap = batchify(corpus.trainp, args.batch_size) #GAM~ Tensor with word indexes size corpus.train.size(0)//arg.batch_size x arg.batch_size
+train_datap = batchify(corpus.trainp, args.batch_size) #GAM~ Tensor with word indexes size corpus.train.size(0)//arg.batch_size x arg.batch_size
 train_datas = batchify(corpus.trains, args.batch_size) #GAM~ Tensor with word indexes size corpus.train.size(0)//arg.batch_size x arg.batch_size
 nbatch1 = corpus.trains.size(0) // args.batch_size
 file = open("ejemplo.txt","w")
 for i in range(nbatch1):
 #    for j in range(args.batch_size):
         file.write(str(train_datas[i]) + "\n")
-        file
+##        file
         print(train_datas[i])
 print(train_datas)
 ##Validate data (prompts and stories)
 ##GAM May619 Activate
-##val_datap = batchify(corpus.validp, eval_batch_size) #GAM~ Tensor with word indexes size corpus.valid.size(0)//arg.batch_size x arg.batch_size
+val_datap = batchify(corpus.validp, eval_batch_size) #GAM~ Tensor with word indexes size corpus.valid.size(0)//arg.batch_size x arg.batch_size
 val_datas = batchify(corpus.valids, eval_batch_size) #GAM~ Tensor with word indexes size corpus.valid.size(0)//arg.batch_size x arg.batch_size
 ##Test data (prompts and stories)
 ##GAM May619 Activate
-##test_datap = batchify(corpus.testp, eval_batch_size) #GAM~ Tensor with word indexes size corpus.test.size(0)//arg.batch_size x arg.batch_size
+test_datap = batchify(corpus.testp, eval_batch_size) #GAM~ Tensor with word indexes size corpus.test.size(0)//arg.batch_size x arg.batch_size
 test_datas = batchify(corpus.tests, eval_batch_size) #GAM~ Tensor with word indexes size corpus.test.size(0)//arg.batch_size x arg.batch_size
 
 ###############################################################################
@@ -182,30 +184,53 @@ def evaluate(data_source):
     return total_loss / (len(data_source) - 1)
 
 
-def train():
+##def train(): #Original
+def train(trainx,ps): #GAM ~ Recieve what is it going to train on
+
     # Turn on training mode which enables dropout.
     model.train()
     total_loss = 0.
     start_time = time.time()
     ntokens = len(corpus.dictionary)
-    hidden = model.init_hidden(args.batch_size)
+    hidden = model.init_hidden(args.batch_size) #GAM ~ Original
+##    hidden = model.init_hidden(args.batch_size,args.bptt) #GAM ~ 15may19
 #    print(model.parameters())
     optimizer = torch.optim.SGD(model.parameters(), lr) ## Original ~ 15abr19
 ##    optimizer = torch.optim.Adam(model.parameters(),lr) ##GAM ~ 15apr19 default lr= 1e-3
-    for batch, i in enumerate(range(0, train_datas.size(0) - 1, args.bptt)):
-
+#    for batch, i in enumerate(range(0, train_datas.size(0) - 1, args.bptt)): #Original
+    for batch, i in enumerate(range(0, trainx.size(0) - 1, args.bptt)):
 ##        data, targets = get_batch(train_datap, i) #Assign data and target (original program)
-        data, targets = get_batch(train_datas, i ) #Assign data to Prompt and target to Stories
+        data, targetp = get_batch(trainx, i ) #Assign data to Prompt and target to Stories
 
 
         # Starting each batch, we detach the hidden state from how it was previously produced.
         # If we didn't, the model would try backpropagating all the way to the start of the dataset.
         hidden = repackage_hidden(hidden)
         model.zero_grad() #GAM~ """Sets gradients of all model parameters to zero.""" ## In the original is active
-        output, hidden = model(data, hidden) #GAM ~ module.py _call_ -- forward
+        output, hidden = model(data, hidden,data,ps) #GAM ~ module.py _call_ -- forward
 
-        loss = criterion(output.view(-1, ntokens), targets) #GAM ~ initializes 'loss as a 'criterion' (CrossEntropyLoss())
+        if ps == 1:
 
+        # feed the prompt (train_datap) into stories (train_datas) ## GAM ~ 13may19
+##        datax = torch.empty(35,32, dtype=torch.float)
+            data, targets = get_batch(train_datas, i )
+            datax = data.float()
+            datax.resize_as_(output)
+##GAM~ Concatenates the result of the "prompt" (output) last hidden state with the storie "train_datas" (data)  that corresponds
+##        outputx = torch.cat((output,datax),0)
+            hidden = repackage_hidden(hidden)
+            model.zero_grad()  # GAM~ """Sets gradients of all model parameters to zero.""" ## In the original is active
+            outputy, hidden = model(data, hidden,hidden[1],1) #GAM ~ module.py _call_ -- forward. Feed the last hidden state
+            outputz, outputzz = torch.split(outputy,35,0) ## 35 size of sequence length
+##            (outputy.size(0)-hidden[1].size(0),outputy.size(1),outputy.size(2))
+
+#GAM~ outputy 2 more dimension because of the concatenation of data and hidden[1] from the line above
+
+##        loss = criterion(output.view(-1, ntokens), targets) #GAM ~ initializes 'loss as a 'criterion' (CrossEntropyLoss()) Original
+##        loss = criterion(outputy.view(args.bptt, ntokens), targets) #GAM ~ 16may19
+            loss = criterion(outputz.view(-1, ntokens),targets)  # GAM ~ initializes 'loss as a 'criterion' (CrossEntropyLoss()) Original
+        else:
+            loss = criterion(output.view(-1, ntokens), targetp)
 
         optimizer.zero_grad()  ## GAM ~ 15abr19 ##GAM~ May6-19 (in the original is after "for"
 ##GAM -        print("loss - Criterion: ", loss)
@@ -256,8 +281,18 @@ best_val_loss = None
 try:
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
-        train()
-        print ('End of train()')
+        pathp = os.path.join(args.data, 'prompts.tokens.alligned_train.24042019.txt')
+        with open(pathp, 'r', encoding="utf8") as fp:
+            for x in fp:
+                xp= data.Corpusline(x,corpus.dictionary.word2idx) #Tokenize the line
+                train(xp.linesinfile,0)
+                print ('End of train()  Prompt')
+                paths = os.path.join(args.data, 'stories.tokens.alligned_train.24042019.txt')
+                with open(paths, 'r', encoding="utf8") as fs:
+                    for y in fs:
+                        data.tokenizell(y)
+                        train(y,1)
+                        print ('End of train() Story')
         val_loss = evaluate(val_datas)
         print('-' * 89)
         print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
