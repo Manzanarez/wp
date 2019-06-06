@@ -41,13 +41,13 @@ parser.add_argument('--clip', type=float, default=0.25,
                     help='gradient clipping')
 parser.add_argument('--epochs', type=int, default=40,
                     help='upper epoch limit')
-## Change to 32
+## Change to 16
 ##parser.add_argument('--batch_size', type=int, default=20, metavar='N',
-parser.add_argument('--batch_size', type=int, default=32, metavar='N',
+parser.add_argument('--batch_size', type=int, default=16, metavar='N',
                     help='batch size')
 ##parser.add_argument('--bptt', type=int, default=35,
 ## GAM ~ Change from 35 to 10 to make it faster
-parser.add_argument('--bptt', type=int, default=35,
+parser.add_argument('--bptt', type=int, default=10,
                     help='sequence length')
 parser.add_argument('--dropout', type=float, default=0.2,
                     help='dropout applied to layers (0 = no dropout)')
@@ -58,8 +58,8 @@ parser.add_argument('--seed', type=int, default=1111,
 parser.add_argument('--cuda', action='store_true',
                     help='use CUDA')
 #parser.add_argument('--log-interval', type=int, default=200, metavar='N',
-## GAM ~ Change from 200 to 100 to make it faster
-parser.add_argument('--log-interval', type=int, default=200, metavar='N',
+## GAM ~ Change from 200 to 16 to make it faster
+parser.add_argument('--log-interval', type=int, default=1, metavar='N',
                     help='report interval')
 parser.add_argument('--save', type=str, default='model.pt',
                     help='path to save the final model')
@@ -177,7 +177,7 @@ def evaluate(data_source):
         for i in range(0, data_source.size(0) - 1, args.bptt):
  ## GAM           print('\n evaluate {:10d} | data source size {:10d} | bptt {:4d}'.format(i, data_source.size(0), args.bptt))
             data, targets = get_batch(data_source, i)
-            output, hidden = model(data, hidden)
+            output, hidden = model(data, hidden,data,0)
             output_flat = output.view(-1, ntokens)
             total_loss += len(data) * criterion(output_flat, targets).item()
             hidden = repackage_hidden(hidden)
@@ -185,56 +185,60 @@ def evaluate(data_source):
 
 
 ##def train(): #Original
-def train(trainx,ps): #GAM ~ Recieve what is it going to train on
+def train(trainx,ps,hp): #GAM ~ Recieve what is it going to train on, hp = hidden from prompt
 
     # Turn on training mode which enables dropout.
     model.train()
     total_loss = 0.
     start_time = time.time()
     ntokens = len(corpus.dictionary)
-    hidden = model.init_hidden(args.batch_size) #GAM ~ Original
+#    hidden = model.init_hidden(args.batch_size) #GAM ~ Original
 ##    hidden = model.init_hidden(args.batch_size,args.bptt) #GAM ~ 15may19
+
+
+    hiddenp = model.init_hidden(args.batch_size)
+    hidden = model.init_hidden(args.batch_size)
 #    print(model.parameters())
     optimizer = torch.optim.SGD(model.parameters(), lr) ## Original ~ 15abr19
 ##    optimizer = torch.optim.Adam(model.parameters(),lr) ##GAM ~ 15apr19 default lr= 1e-3
 #    for batch, i in enumerate(range(0, train_datas.size(0) - 1, args.bptt)): #Original
-    for batch, i in enumerate(range(0, trainx.size(0) - 1, args.bptt)):
+    for batch, i in enumerate(range(0, trainx.size(0) - 1, args.bptt)): ##Original
+##    for batch, i in enumerate(range(0, trainx.size(0), args.bptt)): #Changed because it doesn't takes when first dimension = 1
 ##        data, targets = get_batch(train_datap, i) #Assign data and target (original program)
-        data, targetp = get_batch(trainx, i ) #Assign data to Prompt and target to Stories
+        if ps == 0:
+            data, targetp = get_batch(trainx, i ) #Assign data to Prompt and target to Stories
 
 
         # Starting each batch, we detach the hidden state from how it was previously produced.
         # If we didn't, the model would try backpropagating all the way to the start of the dataset.
-        hidden = repackage_hidden(hidden)
-        model.zero_grad() #GAM~ """Sets gradients of all model parameters to zero.""" ## In the original is active
-        output, hidden = model(data, hidden,data,ps) #GAM ~ module.py _call_ -- forward
-
-        if ps == 1:
+            hiddenp = repackage_hidden(hiddenp)
+            model.zero_grad() #GAM~ """Sets gradients of all model parameters to zero.""" ## In the original is active
+            output, hiddenp = model(data, hiddenp,data,ps) #GAM ~ module.py _call_ -- forward()
+            loss = criterion(output.view(-1, ntokens), targetp)
+        else:
 
         # feed the prompt (train_datap) into stories (train_datas) ## GAM ~ 13may19
 ##        datax = torch.empty(35,32, dtype=torch.float)
-            data, targets = get_batch(train_datas, i )
-            datax = data.float()
-            datax.resize_as_(output)
+            data, targets = get_batch(trainx, i )
+##ojo            datax = data.float()
+##ojo            datax.resize_as_(output)
 ##GAM~ Concatenates the result of the "prompt" (output) last hidden state with the storie "train_datas" (data)  that corresponds
 ##        outputx = torch.cat((output,datax),0)
             hidden = repackage_hidden(hidden)
             model.zero_grad()  # GAM~ """Sets gradients of all model parameters to zero.""" ## In the original is active
-            outputy, hidden = model(data, hidden,hidden[1],1) #GAM ~ module.py _call_ -- forward. Feed the last hidden state
-            outputz, outputzz = torch.split(outputy,35,0) ## 35 size of sequence length
+            outputy, hidden = model(data, hidden,hp[1][1],1) #GAM ~ module.py _call_ -- forward. Feed the last hidden state
+            outputz = torch.split(outputy,args.batch_size,0) ## 35 size of sequence length
 ##            (outputy.size(0)-hidden[1].size(0),outputy.size(1),outputy.size(2))
 
 #GAM~ outputy 2 more dimension because of the concatenation of data and hidden[1] from the line above
 
 ##        loss = criterion(output.view(-1, ntokens), targets) #GAM ~ initializes 'loss as a 'criterion' (CrossEntropyLoss()) Original
 ##        loss = criterion(outputy.view(args.bptt, ntokens), targets) #GAM ~ 16may19
-            loss = criterion(outputz.view(-1, ntokens),targets)  # GAM ~ initializes 'loss as a 'criterion' (CrossEntropyLoss()) Original
-        else:
-            loss = criterion(output.view(-1, ntokens), targetp)
+            loss = criterion(outputy.view(-1, ntokens),targets)  # GAM ~ initializes 'loss as a 'criterion' (CrossEntropyLoss()) Original
 
-        optimizer.zero_grad()  ## GAM ~ 15abr19 ##GAM~ May6-19 (in the original is after "for"
+##        optimizer.zero_grad()  ## GAM ~ 15abr19 ##GAM~ May6-19 (in the original is not in the code)
 ##GAM -        print("loss - Criterion: ", loss)
-        loss.backward() #GAM ~ Initializes 'loss' as a backward() in __init__.py, loos has the value given when calling CrossEntropyLoss
+        loss.backward(retain_graph=True) #GAM ~ Initializes 'loss' as a backward() in __init__.py, loos has the value given when calling CrossEntropyLoss
 ##GAM -        print("loss backward: ", loss)
         # `clip_grad_norm` helps prevent the exploding gradient problem in RNNs / LSTMs.
         #GAM ~ Clips gradient norm of an iterable parameters.
@@ -243,7 +247,8 @@ def train(trainx,ps): #GAM ~ Recieve what is it going to train on
         #Gradient clipping limits the magnitude of the gradient and can make
         # stochastic gradient descent (SGD) behave better in the vicinity of steep cliffs:
         torch.nn.utils.clip_grad_norm_(model.parameters(), args.clip) ##GAM~ May6-19 in the original is active
-##        optimizer.step()  ## GAM ~ 15abr19
+
+        optimizer.step()  ## GAM ~ 15abr19
         for p in model.parameters(): #GAM~ 23april19 in the original is active?
             p.data.add_(-lr, p.grad.data) #GAM~ 23april19 in the original is active?
 
@@ -255,13 +260,13 @@ def train(trainx,ps): #GAM ~ Recieve what is it going to train on
             elapsed = time.time() - start_time
             ##GAM~ ppl = perplexity is calculated using cur_loss which is the total_loss (using cross entropy)
             ## divided by the log_interval, in other words the average loss by log_interval or batch
-            print('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.6f} | ms/batch {:5.2f} | '
+            print('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
                     'loss {:5.2f} | ppl {:8.2f}'.format(
                 epoch, batch, len(train_datas) // args.bptt, lr,
                 elapsed * 1000 / args.log_interval, cur_loss, math.exp(cur_loss)))
             total_loss = 0
             start_time = time.time()
-
+    return hiddenp
 
 
 def export_onnx(path, batch_size, seq_len):
@@ -281,18 +286,28 @@ best_val_loss = None
 try:
     for epoch in range(1, args.epochs+1):
         epoch_start_time = time.time()
+        hp = model.init_hidden(args.batch_size) #result of hidden from prompt
+        st = 0
+        pr = 0
         pathp = os.path.join(args.data, 'prompts.tokens.alligned_train.24042019.txt')
         with open(pathp, 'r', encoding="utf8") as fp:
             for x in fp:
-                xp= data.Corpusline(x,corpus.dictionary.word2idx) #Tokenize the line
-                train(xp.linesinfile,0)
-                print ('End of train()  Prompt')
+                xp = data.Corpusline(x,corpus.dictionary.word2idx) #Tokenize the line
+                xpb = batchify(xp.linesinfile,args.batch_size)
+                hp=train(xpb,0,hp)
+                print ('End of train()  Prompt: ', pr)
                 paths = os.path.join(args.data, 'stories.tokens.alligned_train.24042019.txt')
                 with open(paths, 'r', encoding="utf8") as fs:
                     for y in fs:
-                        data.tokenizell(y)
-                        train(y,1)
-                        print ('End of train() Story')
+                        if st == pr:
+                            ys = data.Corpusline(y,corpus.dictionary.word2idx)
+                            ysb = batchify(ys.linesinfile,args.batch_size)
+                            hp=train(ysb,1,hp)
+                            print ('End of train() Story: ',st)
+                            break
+                        else:
+                            st+= 1
+                pr += 1
         val_loss = evaluate(val_datas)
         print('-' * 89)
         print('| end of epoch {:3d} | time: {:5.2f}s | valid loss {:5.2f} | '
