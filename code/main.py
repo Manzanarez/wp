@@ -185,7 +185,7 @@ def evaluate(data_source):
 
 
 ##def train(): #Original
-def train(trainx,ps,hp): #GAM ~ Recieve what is it going to train on, hp = hidden from prompt
+def train(trainx,ps,hp,st): #GAM ~ Recieve what is it going to train on, hp = hidden from prompt
 
     # Turn on training mode which enables dropout.
     model.train()
@@ -260,8 +260,8 @@ def train(trainx,ps,hp): #GAM ~ Recieve what is it going to train on, hp = hidde
             elapsed = time.time() - start_time
             ##GAM~ ppl = perplexity is calculated using cur_loss which is the total_loss (using cross entropy)
             ## divided by the log_interval, in other words the average loss by log_interval or batch
-            print('| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
-                    'loss {:5.2f} | ppl {:8.2f}'.format(
+            print('|st {:3d}| epoch {:3d} | {:5d}/{:5d} batches | lr {:02.2f} | ms/batch {:5.2f} | '
+                    'loss {:5.2f} | ppl {:8.2f}'.format(st,
                 epoch, batch, len(train_datas) // args.bptt, lr,
                 elapsed * 1000 / args.log_interval, cur_loss, math.exp(cur_loss)))
             total_loss = 0
@@ -294,16 +294,16 @@ try:
             for x in fp:
                 xp = data.Corpusline(x,corpus.dictionary.word2idx) #Tokenize the line
                 xpb = batchify(xp.linesinfile,args.batch_size)
-                hp=train(xpb,0,hp)
-                print ('End of train()  Prompt: ', pr)
+                hp=train(xpb,0,hp,pr)
+ ##               print ('End of train()  Prompt: ', pr)
                 paths = os.path.join(args.data, 'stories.tokens.alligned_train.24042019.txt')
                 with open(paths, 'r', encoding="utf8") as fs:
                     for y in fs:
                         if st == pr:
                             ys = data.Corpusline(y,corpus.dictionary.word2idx)
                             ysb = batchify(ys.linesinfile,args.batch_size)
-                            hp=train(ysb,1,hp)
-                            print ('End of train() Story: ',st)
+                            hp=train(ysb,1,hp,st)
+##                            print ('End of train() Story: ',st)
                             break
                         else:
                             st+= 1

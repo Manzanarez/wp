@@ -135,5 +135,5 @@ class Corpusline(object):
          ## GAM~ Remove           print ('ids[token]: ', ids[token])
             token += 1
 ## GAM ~ To find only words that are repeated more than 10 times        self.dictionary.morethan10(self.dictionary.vocabulary)
-        print('ids:',ids)
+##        print('ids:',ids)
         return ids
