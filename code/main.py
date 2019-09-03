@@ -78,7 +78,8 @@ if torch.cuda.is_available():
         print("WARNING: You have a CUDA device, so you should probably run with --cuda")
 
 #GAM - Device where is going to be executed CUDA or CPU
-device = torch.device("cuda" if args.cuda else "cpu")
+##device = torch.device("cuda" if args.cuda else "cpu")
+device = torch.device(2)
 
 ###############################################################################
 # Load data
