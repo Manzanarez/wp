@@ -79,7 +79,8 @@ if torch.cuda.is_available():
 
 #GAM - Device where is going to be executed CUDA or CPU
 ##device = torch.device("cuda" if args.cuda else "cpu")
-device = torch.device(2)
+## How to specify the GPU to use, in this case number 0
+device = torch.device(0)
 
 ###############################################################################
 # Load data
