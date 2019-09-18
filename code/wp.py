@@ -1,7 +1,12 @@
+from typing import TextIO
+
 from nltk.probability import FreqDist
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, RegexpTokenizer
+from langdetect import detect
+import string
 import csv
 import glob
+import re
 
 
 ## Structure of the csv file
@@ -19,15 +24,43 @@ import glob
 #TODO: For on all corpus files
 
 #print(glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
+freq = 0 ## frequency distribution
 vocabulary_list = []
+vocabulary_listm10 = []
+vocabulary_listl10 = []
+prompts_list = []
+stories_list = []
+prompts_indexl = []
 corpus_size = 0
-notvalidflair = 0
-offtopic = 0
-#file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
-#file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
-file_list = glob.glob("/home/gerardo/code/wp/data/csv/wp2016w33.csv")
+notvalidflairt = 0
+offtopict = 0
+#lst = list()
+prof1t = 0
+prof2t = 0
+prof3t = 0
+prof0t = 0
+bott = 0
+notin301000t = 0
+langnotent = 0
+erlangnotent = 0
+notinflairlt = 0
+line_countt = 0
+indexv = 0
+wordnum = 0
+##  file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
+file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
+##  file_list = glob.glob("/home/gerardo/code/wp/data/csv/wp2016w33.csv")
+##  file_list = glob.glob("/home/gerardo/code/wp/data/test/wp2017w11.csv")
+##file_list = glob.glob("/home/gerardo/code/wp/data/train/*.csv") ## Files to train
+##  file_list = glob.glob("/home/gerardo/code/wp/data/test/wp2016w41.csv")
 
 vocab = open("vocab.txt","w+") ##File that stores the unique vocabulary
+##promptfile = open("pf.txt","w+") ##File to write all the prompts
+##storyfile = open("sf.txt","w+") ##File to write all the prompts stories
+promptfilel = open("/home/gerardo/code/wp/data/train/prompts.tokens.alligned_train.18092019.txt","w+") ##File to write all the prompts
+storyfilel = open("/home/gerardo/code/wp/data/train/stories.tokens.alligned_train.18092019.txt","w+") ##File to write all the prompts stories
+analysis_result = open("analysis_resultTest.txt","w+") ##File to write the analysis of all the files read
+word_repeatstats = open("word_repeatstatsTest.txt", "w+") ## File to write the analysis of all the words (reapeated)
 
 ##Do not consider promts that are labeled as:
 ##[MP] = Media Prompt: Audio or Video
@@ -38,58 +71,277 @@ vocab = open("vocab.txt","w+") ##File that stores the unique vocabulary
 ## **Off Topice in the body text
 
 valid_prompts = ['WP','SP','EU','CW','TT','RF','PM','PI','CC']
-
+##with open("base-list-of-bad-words_CSV-file_2018_07_30.csv") as prof_file:
+ ##   prof_filer = csv.reader(prof_file, delimiter=',')
 #with open(base-list-of-bad-words_CSV-file_2018_07_30.csv) as f:
 #    f = f.readlines()
-
+tok_rowr = RegexpTokenizer('[a-zA-Z]\w+\'?\w*')
+#prof="Fuck"
 for file_name in file_list:
     with open(file_name) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0 #to count how many lines are in a file
+        notvalidflair = 0
+        offtopic = 0
+        prof1 = 0
+        prof2 = 0
+        prof3 = 0
+        prof0 = 0
+        bot = 0
+        notin301000 = 0
+        langnoten = 0
+        erlangnoten = 0
+        notinflairl = 0
         print('PROCESSING FILE:', file_name)
         word_dist = FreqDist()
-    
+        prompt_index = 0
+        storie_index = 0
+
         for row in csv_reader:
+            tokenx = word_tokenize(row[2])
+#            ll = [x for x in l if not re.fullmatch('[' + string.punctuation + ']+', x)]
+#           tok_row2t = [x for x in tokenx if not re.fullmatch('[' + string.punctuation + ']+',x)]
+#           tok_row2t = [x for x in tok_row2t if re.fullmatch('[' + string.ascii_letters + ']+',x)]
+##            tok_row0 = ["IND"] #Index in tok_row0 list first element
+            tok_row0 = ["IND"] + [tok_rowr.tokenize(row[0])]  ## tokenizes the title
+#            tok_row1 = [tok_rowr.tokenize(row[1])]  ## tokenizes the author
+##            tok_row2 = ["IND"]  # Index in tok_row2 list first element
+            tok_row2 = ["IND"] + [tok_rowr.tokenize(row[2])]  ## tokenizes the body
+#            tok_row0 = [word_tokenize(row[0])]  ## tokenizes the title
+#            tok_row1 = [word_tokenize(row[1])]  ## tokenizes the author
+#            tok_row2 = [word_tokenize(row[2])]  ## tokenizes the body
             line_count += 1
-            tok_row0 = [word_tokenize(row[0])]  ## tokenizes the title
-            tok_row1 = [word_tokenize(row[1])]  ## tokenizes the author
-            tok_row2 = [word_tokenize(row[2])]  ## tokenizes the body
+            line_countt = line_countt + 1
 
 ##            print(len(tok_row2[0]))  #to know the length of the token
-
-            if len(tok_row2[0]) >= 30 and len(tok_row2[0]) <= 1000:
+##          Valid flair list
+            if len(tok_row2[1]) >= 30 and len(tok_row2[1]) <= 1000:
                 try:
-                    tok_row0[0][1] == 'WP' or tok_row0[0][1] == 'SP'\
-                    or tok_row0[0][1] == 'EU' or tok_row0[0][1] == 'CW'\
-                    or tok_row0[0][1] == 'TT' or tok_row0[0][1] == 'RF' \
-                    or tok_row0[0][1] == 'PM' or tok_row0[0][1] == 'PI' \
-                    or tok_row0[0][1] == 'CC' or tok_row0[0][1] == 'MP' \
-                    or tok_row0[0][1] == 'IP'
-                                ##               and tok_row0[0][1] in valid_prompts:
+                    if tok_row0[1][0] == 'WP' or tok_row0[1][0] == 'SP' \
+                    or tok_row0[1][0] == 'EU' or tok_row0[1][0] == 'CW' \
+                    or tok_row0[1][0] == 'TT' or tok_row0[1][0] == 'RF' \
+                    or tok_row0[1][0] == 'TT' or tok_row0[1][0] == 'RF' \
+                    or tok_row0[1][0] == 'PM' or tok_row0[1][0] == 'PI' \
+                    or tok_row0[1][0] == 'CC' or tok_row0[1][0] == 'MP' \
+                    or tok_row0[1][0] == 'IP':
+                    ##               and tok_row0[0][1] in valid_prompts:
 
-                    if tok_row2[0][0] == '**Off-Topic':  #Do not consider body that contains ** Off Topic
-                        offtopic += 1
-                    else:
-                        corpus_size+=1
+                        if tok_row2[1][0] == '**Off-Topic' or tok_row2[1][0] == 'Off topic':  # Do not consider body that contains ** Off Topic
+                            offtopic += 1
+                            offtopict = offtopict + 1
+                            print('**Off-Topic')
+                        else:
+                            #Do not consider if the submission has been remover
+                            if 'www.reddit.com/r/WritingPrompts/' in row[2]:
+                                print("Submission removed by WritingPrompts")
+                                bot += 1
+                                bott = bott + 1
+                            else:
+                                #Do not consider if The post has been removed
+                                if 'has been removed' in row[2]:
+                                    print("Post has been removed by WritingPrompts ")
+                                    bot += 1
+                                    bott = bott + 1
+                                else:
+                                    prof0 = 0 #to know if the text has profanity
+                                    try:
+                                        language = detect(row[2]) #To detect the language of the prompt
+                                        if language == 'en': #only consider prompts in english
+##                                            line_count += 1
+                                        #list of words with profanity
+                                            with open("/home/gerardo/code/wp/data/validate/bad_words/base-list-of-bad-words_val.csv",encoding = "ISO-8859-1") as prof_file:
+##            with open("base-list-of-bad-words_TXT-file_2018_07_30.txt",encoding = "ISO-8859-1") as prof_file:
+                                                prof_filer = csv.reader(prof_file, delimiter=',')
+                                                for prof_word in prof_filer:
+                                                    #search profanity in lower case. Note: using re.search() to find the whole word
+                                                    if re.search(r'\b' + prof_word[0] + r'\b', row[0]) or re.search(r'\b' + prof_word[0] + r'\b', row[2]):
+                                                        print("Profanity1", prof_word[0])
+                                                        prof1 += 1
+                                                        prof1t = prof1t + 1
+                                                        prof0 = 1
+                                                        break
+                                                    else:
+                                                    #Convert to upper case the whole word
+                                                        prof_word_upper = [i.upper() for i in prof_word]
+                                                        # search profanity word in upper case . Note: using re.search() to find the whole word
+                                                        if re.search(r'\b' + prof_word_upper[0] + r'\b', row[0]) or re.search(r'\b' + prof_word_upper[0] + r'\b', row[2]):
+                                                            print("Profanity2", prof_word_upper[0])
+                                                            prof2 += 1
+                                                            prof2t = prof2t + 1
+                                                            prof0 = 1
+                                                            break
+                                                        else:
+                                                            #Capitalize only the first letter of the word
+                                                            prof_word_upper = [i.capitalize() for i in prof_word]
+                                                            #search profanity word in upper case . Note: using re.search() to find the whole word
+                                                            if re.search(r'\b' + prof_word_upper[0] + r'\b', row[0]) or re.search(r'\b' + prof_word_upper[0] + r'\b', row[2]):
+                                                                print("Profanity3", prof_word_upper[0])
+                                                                prof3 += 1
+                                                                prof3t = prof3t + 1
+                                                                prof0 = 1
+                                                                break
+                                                if prof0 == 0:
+                                                    corpus_size+=1
+                                                    ##"EOD" token added to end of the body
+##                                                    tok_row0[0].append('\n')
+                                                    tok_row2[1].append('EOD')
+##                                                    tok_row2[0].append("\n")
+##                                                    tok_row2[0].append('\n')
                 ##This token is going to be part of the final ones
+                ## Printing the prompt title
+                                                    print(tok_row0[1])
 
-                        print(tok_row0[0]) #Printing the title
-##                print('title lenght:', len(tok_row0[0]))
 ##                    print(tok_row1[0]) #Printing the author  ## To know the author
-                        print(tok_row2[0]) #Printing the body
+                                                    print(tok_row2[1]) #Printing the body
 ##                print('body lenght:', len(tok_row2[0]))
-                        vocabulary_list += tok_row0[0]
-                        vocabulary_list += tok_row2[0] ## in order to get the vocabulary
-##                print('Vocabulary list size', len(vocabulary_list))
+##                                                    promptfile.write("{}\n".format(tok_row0[0]))
+##                                                    storyfile.write("{}\n".format(tok_row2[0]))
 
+                                                    vocabulary_list += tok_row0[1]
+                                                    vocabulary_list += tok_row2[1] ## in order to get the vocabulary
+                                                    storie_index += 1
+                                                    if prompt_index > 0:
+                                                        for ind in range(len(prompts_indexl)):
+                                                            if prompts_indexl[ind] == tok_row0[1]:
+                                                                break
+                                                            else:
+                                                                if ind+1 == len(prompts_indexl):
+                                                                    prompt_index += 1
+                                                                    prompts_indexl += [tok_row0[1]]
+##                                                    prompts_list += [str(prompt_index)] + [tok_row0[0]]
+                                                    tok_row0[0] = str(prompt_index)
+                                                    tok_row2[0] = str(prompt_index)
+                                                    prompts_list += [tok_row0]
+                                                    stories_list += [tok_row2]
+                                                    if prompt_index == 0:
+                                                        prompt_index += 1
+                                                        prompts_indexl +=  [tok_row0[1]]
+##                print('Vocabulary list size', len(vocabulary_list))
+                                        else:
+                                            langnoten += 1
+                                            langnotent = langnotent + 1
+                                            print('Language not english')
+                                    except:
+                                        erlangnoten += 1
+                                        erlangnotent = erlangnotent + 1
+                                        print('Error Language not english')
+                    else:
+                        notinflairl +=1
+                        notinflairlt = notinflairlt + 1
+                        print('Not in flair list')
                 except IndexError:
                     notvalidflair += 1
-unique_vocabulary_set = set (vocabulary_list)
-vocab = open("vocab.txt","w")
+                    notvalidflairt = notvalidflairt + 1
+            else:
+                notin301000 += 1
+                notin301000t = notin301000t + 1
+        with open("analysis_resultTest.txt", "a+") as analysis_result:
+ ##         analysis_result.write('UNIQUE_VOCABULARY_SET_SIZE: %d \n' % len(unique_vocabulary_set))
+            analysis_result.write('PROCESSING FILE:, %s \n' % file_name)
+            analysis_result.write('CORPUS_SIZE:, %d \n' % corpus_size)
+            analysis_result.write('LINE COUNT:, %d \n' % line_count)
+            analysis_result.write('NOT IN FLAIR LIST: %d \n' % notinflairl)
+            analysis_result.write('BOT:, %d \n' % bot)
+            analysis_result.write('NOT VALID FLAIR:, %d \n' % notvalidflair)
+            analysis_result.write('OFF-TOPIC:, %d \n' % offtopic)
+            analysis_result.write('PROFANITY lower case:, %d \n' % prof1)
+            analysis_result.write('PROFANITY CAPITALS:, %d \n' % prof2)
+            analysis_result.write('Profanity First Letter Capital:, %d \n' % prof3)
+
+print(vocabulary_list)
+freq = FreqDist(vocabulary_list)
+print(freq.most_common((1000000)))
+indexv = 0
+for i in freq:
+    if freq[i] == 1:
+        print('The word ', i, ' repeats ', freq[i], ' time. \n')
+        word_repeatstats.write('The word %s repeats %d time.\n' % (i, freq[i]))
+    else:
+        print ('The word ', i , ' repeats ' , freq[i] , ' times. \n')
+        word_repeatstats.write ('The word %s repeats %d times.\n' % (i,freq[i]))
+
+    if freq[i] < 10:
+##         vocabulary_listl10 += vocabulary_list[indexv]
+        vocabulary_listl10.append(i)
+    else:
+##        vocabulary_listm10 += vocabulary_list[indexv]
+        vocabulary_listm10.append(i)
+    indexv +=1
+#        vocabulary_list[indexv] = "UNK"
+#        for w in range(len(stories_list)):
+#            for x in range(len(stories_list[w])):
+#                if stories_list[w][x] == i:
+#                    stories_list[w][x] = "UNK"
+#        for w in range(len(prompts_list)):
+#           for x in range(len(prompts_list[w])):
+#                if prompts_list[w][x] == i:
+#                    prompts_list[w][x] = "UNK"
+
+
+##        prompts_list[indexv] = "UNK"
+##        stories_list[indexv] = "UNK" ## Find the word in all the lists
+
+##print(prompts_list) > promptfilel
+
+for i in range(len(prompts_list)):
+    promptfilel.write("{}\n".format(prompts_list[i]))
+
+for i in range(len(stories_list)):
+    storyfilel.write("{}\n".format(stories_list[i]))
+#promptfilel.write(" ".join(prompts_list))
+#storyfilel.write(" ".join(stories_list))
+
+unique_vocabulary_set = set(vocabulary_listm10)
+#vocab_tot = open("vocab_tot.txt","w")
+vocab_less10 = open("vocab_less10Test.txt","w")
+#vocab_tot.write(vocab)
+vocab = open("vocabTest.txt","w")
 for v in sorted(unique_vocabulary_set):
     vocab.write("{}\n".format(v))
 
+for v in range(len(vocabulary_listl10)):
+    vocab_less10.write("{}\n".format(vocabulary_listl10[v]))
 
-print ('UNIQUE_VOCABULARY_SET:',sorted(unique_vocabulary_set))
+#for w in stories_list:
+#    if w == "EOD":
+#        storyfilel.write("{}\n"(stories_list[wordnum]))
+#    else:
+#        storyfilel.write("{}".format(stories_list[wordnum]))
+#    wordnum += 1
+
+#wordnum = 0
+#for w in prompts_list:
+#    if w == "EOD":
+#        promptfilel.write("{}\n".format(prompts_list[wordnum]))
+#    else:
+#        promptfilel.write("{}".format(prompts_list[wordnum]))
+#    wordnum += 1
+
+##print ('UNIQUE_VOCABULARY_SET:',sorted(unique_vocabulary_set)) #Is already in file vocab.txt
 print ('UNIQUE_VOCABULARY_SET_SIZE:',len(unique_vocabulary_set))
 print ('CORPUS_SIZE:', corpus_size)
+print ('Line count: ', line_countt)
+print ('Language not english ', langnotent)
+print ('Language not english error', erlangnotent)
+print ('Not in 30 and 1000', notin301000t)
+print ('Bot: ',bott)
+print ('Not in flair list', notinflairlt)
+print ('Not valid flair.', notvalidflairt)
+print ('Off-topic. ', offtopict)
+print ('Profanity lower case', prof1t)
+print ('Profanity CAPITALS ', prof2t)
+print ('Profanity First Letter Capital', prof3t)
+
+with open("analysis_resultTest.txt","a+") as analysis_result:
+    analysis_result.write('\n********FINAL RESULT********* \n')
+    analysis_result.write('UNIQUE_VOCABULARY_SET_SIZE: %d \n' % len(unique_vocabulary_set))
+##   analysis_result.write('PROCESSING FILE: %s \n' % file_name)
+    analysis_result.write('CORPUS_SIZE: %d \n' % corpus_size)
+    analysis_result.write('LINE COUNT: %d \n' % line_countt)
+    analysis_result.write('BOT: %d \n' % bott)
+    analysis_result.write('NOT FLAIR LIST: %d \n' % notinflairlt)
+    analysis_result.write('NOT VALID FLAIR: %d \n' % notvalidflairt)
+    analysis_result.write('OFF-TOPIC: %d \n' % offtopict)
+    analysis_result.write('PROFANITY lower case: %d \n' % prof1t)
+    analysis_result.write('PROFANITY CAPITALS: %d \n' % prof2t)
+    analysis_result.write('Profanity First Letter Capital: %d \n' % prof3t)
