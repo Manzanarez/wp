@@ -50,8 +50,13 @@ wordnum = 0
 ##  file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
 #laptop directory
 ##file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
+
 #directory of .csv files on the server
-file_list = glob.glob("/users/aleman/wp/data/csv/*.csv")
+##file_list = glob.glob("/users/aleman/wp/data/csv/*.csv")
+#file to test
+file_list = glob.glob("/users/aleman/wp/data/csv/*wp2017w11.csv")
+
+
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/csv/wp2016w33.csv")
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/test/wp2017w11.csv")
 ##file_list = glob.glob("/home/gerardo/code/wp/data/train/*.csv") ## Files to train
