@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Langua
 ##parser.add_argument('--data', type=str, default='/opt/wp/data/txt/clean',
 
 ## GAM ~ server Paris
-parser.add_argument('--data', type=str, default='/users/aleman/data/train',
+parser.add_argument('--data', type=str, default='/users/aleman/wp/data/train',
                     help='location of the data corpus')
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)')
