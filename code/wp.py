@@ -65,9 +65,11 @@ line_countt = 0
 indexv = 0
 wordnum = 0
 #laptop directory
-dir = "/home/gerardo/code/wp/"
+##dir = "/home/gerardo/code/wp/"
 #server directory
 dir = "/users/aleman/wp/"
+
+
 ##  file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
 #laptop directory
 ##file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
@@ -78,7 +80,7 @@ dir = "/users/aleman/wp/"
 ##file_list = glob.glob("/users/aleman/wp/data/csv/*wp2017w11.csv")
 
 #files to read from writing prompts per year/week
-file_list = glob.glob(dir+"data/csv/wp2016w*.csv")
+file_list = glob.glob(dir+"data/csv/*.csv")
 
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/csv/wp2016w33.csv")
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/test/wp2017w11.csv")
@@ -292,16 +294,16 @@ for file_name in file_list:
 ##        with open("/users/aleman/wp/data/train/analysis_resultTest.txt", "a+") as analysis_result:
         with open(dir+"data/train/analysis_resultTest.txt", "a+") as analysis_result:
  ##         analysis_result.write('UNIQUE_VOCABULARY_SET_SIZE: %d \n' % len(unique_vocabulary_set))
-            analysis_result.write('PROCESSING FILE:, %s \n' % file_name)
-            analysis_result.write('CORPUS_SIZE:, %d \n' % corpus_size)
-            analysis_result.write('LINE COUNT:, %d \n' % line_count)
+            analysis_result.write('PROCESSING FILE: %s \n' % file_name)
+            analysis_result.write('CORPUS_SIZE: %d \n' % corpus_size)
+            analysis_result.write('LINE COUNT: %d \n' % line_count)
             analysis_result.write('NOT IN FLAIR LIST: %d \n' % notinflairl)
-            analysis_result.write('BOT:, %d \n' % bot)
-            analysis_result.write('NOT VALID FLAIR:, %d \n' % notvalidflair)
-            analysis_result.write('OFF-TOPIC:, %d \n' % offtopic)
-            analysis_result.write('PROFANITY lower case:, %d \n' % prof1)
-            analysis_result.write('PROFANITY CAPITALS:, %d \n' % prof2)
-            analysis_result.write('Profanity First Letter Capital:, %d \n' % prof3)
+            analysis_result.write('BOT: %d \n' % bot)
+            analysis_result.write('NOT VALID FLAIR: %d \n' % notvalidflair)
+            analysis_result.write('OFF-TOPIC: %d \n' % offtopic)
+            analysis_result.write('PROFANITY lower case: %d \n' % prof1)
+            analysis_result.write('PROFANITY CAPITALS: %d \n' % prof2)
+            analysis_result.write('Profanity First Letter Capital: %d \n' % prof3)
             logger.info('End of file %s', file_name)
 
 print(vocabulary_list)
@@ -387,16 +389,16 @@ for v in range(len(vocabulary_listl10)):
 print ('UNIQUE_VOCABULARY_SET_SIZE:',len(unique_vocabulary_set))
 print ('CORPUS_SIZE:', corpus_size)
 print ('Line count: ', line_countt)
-print ('Language not english ', langnotent)
-print ('Language not english error', erlangnotent)
-print ('Not in 30 and 1000', notin301000t)
+print ('Language not english: ', langnotent)
+print ('Language not english error: ', erlangnotent)
+print ('Not in 30 and 1000: ', notin301000t)
 print ('Bot: ',bott)
-print ('Not in flair list', notinflairlt)
-print ('Not valid flair.', notvalidflairt)
-print ('Off-topic. ', offtopict)
-print ('Profanity lower case', prof1t)
-print ('Profanity CAPITALS ', prof2t)
-print ('Profanity First Letter Capital', prof3t)
+print ('Not in flair list: ', notinflairlt)
+print ('Not valid flair: ', notvalidflairt)
+print ('Off-topic: ', offtopict)
+print ('Profanity lower case: ', prof1t)
+print ('Profanity CAPITALS: ', prof2t)
+print ('Profanity First Letter Capital: ', prof3t)
 
 with open(dir+"data/train/analysis_resultTest.txt","a+") as analysis_result:
     analysis_result.write('\n********FINAL RESULT********* \n')
