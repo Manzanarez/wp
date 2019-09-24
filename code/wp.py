@@ -69,7 +69,7 @@ wordnum = 0
 #server directory
 dir = "/users/aleman/wp/"
 
-rm
+
 ##  file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
 #laptop directory
 ##file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
