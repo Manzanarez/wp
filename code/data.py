@@ -64,8 +64,8 @@ class Corpus(object):
 ## GAM- Tokenizes lines available in the file and stores it in self.train (the corpus used to train)
 #   GAM~ Makes a tensor (self.train) with the index of the words in the file used to train
 ##GAM May619 Activate
-        self.trainp,self.linesptr = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_train.24042019.txt')) ## Prompts to train, tensor with ids of words
-        self.trains,self.linesstr = self.tokenize(os.path.join(path, 'stories.tokens.alligned_train.24042019.txt')) ## Stories to train, tensor with ids of words
+        self.trainp,self.linesptr = self.tokenize(os.path.join(path, 'prompts.tokens.alligned_train.18092019.txt')) ## Prompts to train, tensor with ids of words
+        self.trains,self.linesstr = self.tokenize(os.path.join(path, 'stories.tokens.alligned_train.18092019.txt')) ## Stories to train, tensor with ids of words
 ## Original
 ##        self.valids = self.tokenize(os.path.join(path, 'valid.txt'))
 ##        self.tests = self.tokenize(os.path.join(path, 'test.txt'))
