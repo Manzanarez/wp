@@ -22,6 +22,8 @@ parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Langua
 ##parser.add_argument('--data', type=str, default='/opt/wp/data/txt/clean',
 
 ## GAM ~ server Paris
+##parser.add_argument('--data', type=str, default='/users/aleman/wp/data/train',
+##parser.add_argument('--data', type=str, default='/home/gerardo/code/wp/data/train',
 parser.add_argument('--data', type=str, default='/users/aleman/wp/data/train',
                     help='location of the data corpus')
 parser.add_argument('--model', type=str, default='LSTM',
@@ -80,7 +82,8 @@ if torch.cuda.is_available():
 #GAM - Device where is going to be executed CUDA or CPU
 ##device = torch.device("cuda" if args.cuda else "cpu")
 ## How to specify the GPU to use, in this case number 2
-device = torch.device(2)
+#device = torch.device(2)
+device = torch.device('cuda:2')
 
 ###############################################################################
 # Load data
