@@ -69,7 +69,7 @@ wordnum = 0
 #server directory
 dir = "/users/aleman/wp/"
 
-
+rm
 ##  file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
 #laptop directory
 ##file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
@@ -180,17 +180,17 @@ for file_name in file_list:
                         if tok_row2[1][0] == '**Off-Topic' or tok_row2[1][0] == 'Off topic':  # Do not consider body that contains ** Off Topic
                             offtopic += 1
                             offtopict = offtopict + 1
-                            print('**Off-Topic')
+##24sep19                            print('**Off-Topic')
                         else:
                             #Do not consider if the submission has been remover
                             if 'www.reddit.com/r/WritingPrompts/' in row[2]:
-                                print("Submission removed by WritingPrompts")
+##24sep19                                 print("Submission removed by WritingPrompts")
                                 bot += 1
                                 bott = bott + 1
                             else:
                                 #Do not consider if The post has been removed
                                 if 'has been removed' in row[2]:
-                                    print("Post has been removed by WritingPrompts ")
+##24sep19                                     print("Post has been removed by WritingPrompts ")
                                     bot += 1
                                     bott = bott + 1
                                 else:
@@ -210,7 +210,7 @@ for file_name in file_list:
                                                 for prof_word in prof_filer:
                                                     #search profanity in lower case. Note: using re.search() to find the whole word
                                                     if re.search(r'\b' + prof_word[0] + r'\b', row[0]) or re.search(r'\b' + prof_word[0] + r'\b', row[2]):
-                                                        print("Profanity1", prof_word[0])
+##24sep19                                                         print("Profanity1", prof_word[0])
                                                         prof1 += 1
                                                         prof1t = prof1t + 1
                                                         prof0 = 1
@@ -220,7 +220,7 @@ for file_name in file_list:
                                                         prof_word_upper = [i.upper() for i in prof_word]
                                                         # search profanity word in upper case . Note: using re.search() to find the whole word
                                                         if re.search(r'\b' + prof_word_upper[0] + r'\b', row[0]) or re.search(r'\b' + prof_word_upper[0] + r'\b', row[2]):
-                                                            print("Profanity2", prof_word_upper[0])
+##24sep19                                                             print("Profanity2", prof_word_upper[0])
                                                             prof2 += 1
                                                             prof2t = prof2t + 1
                                                             prof0 = 1
@@ -230,7 +230,7 @@ for file_name in file_list:
                                                             prof_word_upper = [i.capitalize() for i in prof_word]
                                                             #search profanity word in upper case . Note: using re.search() to find the whole word
                                                             if re.search(r'\b' + prof_word_upper[0] + r'\b', row[0]) or re.search(r'\b' + prof_word_upper[0] + r'\b', row[2]):
-                                                                print("Profanity3", prof_word_upper[0])
+##24sep19                                                                 print("Profanity3", prof_word_upper[0])
                                                                 prof3 += 1
                                                                 prof3t = prof3t + 1
                                                                 prof0 = 1
@@ -244,10 +244,10 @@ for file_name in file_list:
 ##                                                    tok_row2[0].append('\n')
                 ##This token is going to be part of the final ones
                 ## Printing the prompt title
-                                                    print(tok_row0[1])
+##24sep19                                                     print(tok_row0[1])
 
 ##                    print(tok_row1[0]) #Printing the author  ## To know the author
-                                                    print(tok_row2[1]) #Printing the body
+##24sep19                                                     print(tok_row2[1]) #Printing the body
 ##                print('body lenght:', len(tok_row2[0]))
 ##                                                    promptfile.write("{}\n".format(tok_row0[0]))
 ##                                                    storyfile.write("{}\n".format(tok_row2[0]))
@@ -275,15 +275,15 @@ for file_name in file_list:
                                         else:
                                             langnoten += 1
                                             langnotent = langnotent + 1
-                                            print('Language not english')
+##24sep19                                             print('Language not english')
                                     except:
                                         erlangnoten += 1
                                         erlangnotent = erlangnotent + 1
-                                        print('Error Language not english')
+##24sep19                                         print('Error Language not english')
                     else:
                         notinflairl +=1
                         notinflairlt = notinflairlt + 1
-                        print('Not in flair list')
+##24sep19                         print('Not in flair list')
                 except IndexError:
                     notvalidflair += 1
                     notvalidflairt = notvalidflairt + 1
@@ -306,17 +306,17 @@ for file_name in file_list:
             analysis_result.write('Profanity First Letter Capital: %d \n' % prof3)
             logger.info('End of file %s', file_name)
 
-print(vocabulary_list)
+##24sep19 print(vocabulary_list)
 freq = FreqDist(vocabulary_list)
-print(freq.most_common((1000000)))
+##24sep19 print(freq.most_common((1000000)))
 indexv = 0
 logger.info('Beginning of word repeat writing %s',word_repeatstats)
 for i in freq:
     if freq[i] == 1:
-        print('The word ', i, ' repeats ', freq[i], ' time. \n')
+##24sep19         print('The word ', i, ' repeats ', freq[i], ' time. \n')
         word_repeatstats.write('The word %s repeats %d time.\n' % (i, freq[i]))
     else:
-        print ('The word ', i , ' repeats ' , freq[i] , ' times. \n')
+##24sep19         print ('The word ', i , ' repeats ' , freq[i] , ' times. \n')
         word_repeatstats.write ('The word %s repeats %d times.\n' % (i,freq[i]))
 
     if freq[i] < 10:
