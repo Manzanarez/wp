@@ -7,6 +7,23 @@ import string
 import csv
 import glob
 import re
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler('info.log')
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
+
 
 
 ## Structure of the csv file
@@ -47,33 +64,50 @@ notinflairlt = 0
 line_countt = 0
 indexv = 0
 wordnum = 0
+#laptop directory
+dir = "/home/gerardo/code/wp/"
+#server directory
+dir = "/users/aleman/wp/"
 ##  file_list = glob.glob("/home/harmodio/code/ganso/wp/data/csv/*.csv")
 #laptop directory
 ##file_list = glob.glob("/home/gerardo/code/wp/data/csv/*.csv")
 
 #directory of .csv files on the server
-##file_list = glob.glob("/users/aleman/wp/data/csv/*.csv")
-#file to test
-file_list = glob.glob("/users/aleman/wp/data/csv/*wp2017w11.csv")
+##file_list = glob.glob("/users/aleman/wp/data/csv/wp2016*.csv")
+#file to test on the server
+##file_list = glob.glob("/users/aleman/wp/data/csv/*wp2017w11.csv")
 
+#files to read from writing prompts per year/week
+file_list = glob.glob(dir+"data/csv/wp2016w*.csv")
 
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/csv/wp2016w33.csv")
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/test/wp2017w11.csv")
 ##file_list = glob.glob("/home/gerardo/code/wp/data/train/*.csv") ## Files to train
 ##  file_list = glob.glob("/home/gerardo/code/wp/data/test/wp2016w41.csv")
 
-vocab = open("/users/aleman/wp/data/train/vocab.txt","w+") ##File that stores the unique vocabulary
+##file in the server
+##vocab = open("/users/aleman/wp/data/train/vocab.txt","w+") ##File that stores the unique vocabulary
+
+##file in my computer
+vocab = open(dir+"data/train/vocab.txt","w+") ##File that stores the unique vocabulary
+
 ##promptfile = open("pf.txt","w+") ##File to write all the prompts
 ##storyfile = open("sf.txt","w+") ##File to write all the prompts stories
 #laptop directory
-##promptfilel = open("/home/gerardo/code/wp/data/train/prompts.tokens.alligned_train.18092019.txt","w+") ##File to write all the prompts
-##storyfilel = open("/home/gerardo/code/wp/data/train/stories.tokens.alligned_train.18092019.txt","w+") ##File to write all the prompts stories
+promptfilel = open(dir+"data/train/prompts.tokens.alligned_train.18092019.txt","w+") ##File to write all the prompts
+storyfilel = open(dir+"data/train/stories.tokens.alligned_train.18092019.txt","w+") ##File to write all the prompts stories
+
 ##server directories
-promptfilel = open("/users/aleman/wp/data/train/prompts.tokens.alligned_train.092019.txt","w+") ##File to write all the prompts
-storyfilel = open("/users/aleman/wp/data/train/stories.tokens.alligned_train.092019.txt","w+") ##File to write all the prompts stories
+##promptfilel = open("/users/aleman/wp/data/train/prompts.tokens.alligned_train.092019.txt","w+") ##File to write all the prompts
+##storyfilel = open("/users/aleman/wp/data/train/stories.tokens.alligned_train.092019.txt","w+") ##File to write all the prompts stories
+
+#laptop directory
+analysis_result = open(dir+"data/train/analysis_resultTest.txt","w+") ##File to write the analysis of all the files read
+word_repeatstats = open(dir+"data/train/word_repeatstatsTest.txt", "w+") ## File to write the analysis of all the words (reapeated)
+
 ##server directories
-analysis_result = open("/users/aleman/wp/data/train/analysis_resultTest.txt","w+") ##File to write the analysis of all the files read
-word_repeatstats = open("/users/aleman/wp/data/train/word_repeatstatsTest.txt", "w+") ## File to write the analysis of all the words (reapeated)
+##analysis_result = open("/users/aleman/wp/data/train/analysis_resultTest.txt","w+") ##File to write the analysis of all the files read
+##word_repeatstats = open("/users/aleman/wp/data/train/word_repeatstatsTest.txt", "w+") ## File to write the analysis of all the words (reapeated)
 
 ##Do not consider promts that are labeled as:
 ##[MP] = Media Prompt: Audio or Video
@@ -92,6 +126,8 @@ tok_rowr = RegexpTokenizer('[a-zA-Z]\w+\'?\w*')
 #prof="Fuck"
 for file_name in file_list:
     with open(file_name) as csv_file:
+
+        logger.info('Beginning of file %s',file_name)
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0 #to count how many lines are in a file
         notvalidflair = 0
@@ -162,7 +198,11 @@ for file_name in file_list:
                                         if language == 'en': #only consider prompts in english
 ##                                            line_count += 1
                                         #list of words with profanity
-                                            with open("/users/aleman/wp/data/validate/bad_words/base-list-of-bad-words_val.csv",encoding = "ISO-8859-1") as prof_file:
+                                        ## server directory
+##                                            with open("/users/aleman/wp/data/validate/bad_words/base-list-of-bad-words_val.csv",encoding = "ISO-8859-1") as prof_file:
+                                        ##laptop directory
+                                            with open(dir+"data/validate/bad_words/base-list-of-bad-words_val.csv",encoding = "ISO-8859-1") as prof_file:
+
 ##            with open("base-list-of-bad-words_TXT-file_2018_07_30.txt",encoding = "ISO-8859-1") as prof_file:
                                                 prof_filer = csv.reader(prof_file, delimiter=',')
                                                 for prof_word in prof_filer:
@@ -248,7 +288,9 @@ for file_name in file_list:
             else:
                 notin301000 += 1
                 notin301000t = notin301000t + 1
-        with open("/users/aleman/wp/data/train/analysis_resultTest.txt", "a+") as analysis_result:
+ ## server directory
+##        with open("/users/aleman/wp/data/train/analysis_resultTest.txt", "a+") as analysis_result:
+        with open(dir+"data/train/analysis_resultTest.txt", "a+") as analysis_result:
  ##         analysis_result.write('UNIQUE_VOCABULARY_SET_SIZE: %d \n' % len(unique_vocabulary_set))
             analysis_result.write('PROCESSING FILE:, %s \n' % file_name)
             analysis_result.write('CORPUS_SIZE:, %d \n' % corpus_size)
@@ -260,11 +302,13 @@ for file_name in file_list:
             analysis_result.write('PROFANITY lower case:, %d \n' % prof1)
             analysis_result.write('PROFANITY CAPITALS:, %d \n' % prof2)
             analysis_result.write('Profanity First Letter Capital:, %d \n' % prof3)
+            logger.info('End of file %s', file_name)
 
 print(vocabulary_list)
 freq = FreqDist(vocabulary_list)
 print(freq.most_common((1000000)))
 indexv = 0
+logger.info('Beginning of word repeat writing %s',word_repeatstats)
 for i in freq:
     if freq[i] == 1:
         print('The word ', i, ' repeats ', freq[i], ' time. \n')
@@ -289,26 +333,35 @@ for i in freq:
 #           for x in range(len(prompts_list[w])):
 #                if prompts_list[w][x] == i:
 #                    prompts_list[w][x] = "UNK"
-
+logger.info('End of word repeat writing %s',word_repeatstats)
 
 ##        prompts_list[indexv] = "UNK"
 ##        stories_list[indexv] = "UNK" ## Find the word in all the lists
 
 ##print(prompts_list) > promptfilel
-
+logger.info('Beginning of writing prompts tokenized %s',promptfilel)
 for i in range(len(prompts_list)):
     promptfilel.write("{}\n".format(prompts_list[i]))
+logger.info('End of writing prompts tokenized %s',promptfilel)
 
+logger.info('Beginning of writing stories tokenized %s',storyfilel )
 for i in range(len(stories_list)):
     storyfilel.write("{}\n".format(stories_list[i]))
+logger.info('End of writing stories tokenized %s',storyfilel)
 #promptfilel.write(" ".join(prompts_list))
 #storyfilel.write(" ".join(stories_list))
 
 unique_vocabulary_set = set(vocabulary_listm10)
 #vocab_tot = open("vocab_tot.txt","w")
-vocab_less10 = open("/users/aleman/wp/data/train/vocab_less10Test.txt","w")
+## server directory
+##vocab_less10 = open("/users/aleman/wp/data/train/vocab_less10Test.txt","w")
+#laptop directory
+vocab_less10 = open(dir+"data/train/vocab_less10Test.txt","w")
 #vocab_tot.write(vocab)
-vocab = open("/users/aleman/wp/data/train/vocabTest.txt","w")
+##server directory
+##vocab = open("/users/aleman/wp/data/train/vocabTest.txt","w")
+##laptop directory
+vocab = open(dir+"data/train/vocabTest.txt","w")
 for v in sorted(unique_vocabulary_set):
     vocab.write("{}\n".format(v))
 
@@ -345,7 +398,7 @@ print ('Profanity lower case', prof1t)
 print ('Profanity CAPITALS ', prof2t)
 print ('Profanity First Letter Capital', prof3t)
 
-with open("/users/aleman/wp/data/train/analysis_resultTest.txt","a+") as analysis_result:
+with open(dir+"data/train/analysis_resultTest.txt","a+") as analysis_result:
     analysis_result.write('\n********FINAL RESULT********* \n')
     analysis_result.write('UNIQUE_VOCABULARY_SET_SIZE: %d \n' % len(unique_vocabulary_set))
 ##   analysis_result.write('PROCESSING FILE: %s \n' % file_name)
@@ -358,3 +411,4 @@ with open("/users/aleman/wp/data/train/analysis_resultTest.txt","a+") as analysi
     analysis_result.write('PROFANITY lower case: %d \n' % prof1t)
     analysis_result.write('PROFANITY CAPITALS: %d \n' % prof2t)
     analysis_result.write('Profanity First Letter Capital: %d \n' % prof3t)
+    logger.info('End of all files')
