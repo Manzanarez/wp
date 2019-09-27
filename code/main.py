@@ -6,10 +6,27 @@ import os
 import torch
 import torch.nn as nn
 import torch.onnx
+import logging
 
 
 import data
 import model
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+# create a file handler
+handler = logging.FileHandler('info.log')
+handler.setLevel(logging.INFO)
+
+# create a logging format
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
+
+# add the handlers to the logger
+logger.addHandler(handler)
+
+
 
 # GAM- All arguments needed for the neural network
 parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Language Model')
@@ -23,8 +40,7 @@ parser = argparse.ArgumentParser(description='PyTorch Wikitext-2 RNN/LSTM Langua
 
 ## GAM ~ server Paris
 ##parser.add_argument('--data', type=str, default='/users/aleman/wp/data/train',
-##parser.add_argument('--data', type=str, default='/home/gerardo/code/wp/data/train',
-parser.add_argument('--data', type=str, default='/users/aleman/wp/data/train',
+parser.add_argument('--data', type=str, default='/home/gerardo/code/wp/data/train',
                     help='location of the data corpus')
 parser.add_argument('--model', type=str, default='LSTM',
                     help='type of recurrent net (RNN_TANH, RNN_RELU, LSTM, GRU)')
@@ -85,6 +101,7 @@ if torch.cuda.is_available():
 #device = torch.device(2)
 device = torch.device('cuda:2')
 
+
 ###############################################################################
 # Load data
 ###############################################################################
@@ -125,7 +142,9 @@ for i in range(nbatch1):
         file.write(str(train_datas[i]) + "\n")
 ##        file
         print(train_datas[i])
+        logger.info('Train data story[i] %s', str(i))
 print(train_datas)
+logger.info('Train data story')
 ##Validate data (prompts and stories)
 ##GAM May619 Activate
 val_datap = batchify(corpus.validp, eval_batch_size) #GAM~ Tensor with word indexes size corpus.valid.size(0)//arg.batch_size x arg.batch_size
